@@ -1,0 +1,40 @@
+#!/usr/bin/env ruby
+
+require 'optparse'
+require 'net/http'
+require 'json'
+require 'uri'
+require_relative 'rest_client'
+require_relative 'city'
+require_relative 'aggregation_search'
+require_relative 'haversine_distance'
+require_relative 'comparator'
+
+options = {}
+parser = OptionParser.new do |parser|
+  parser.on("--from FROM_CITY", "The departure city")
+  parser.on("--to x,y,z", Array, "A list of potential destination cities")
+  parser.on("--help", "Prints this help") do
+    puts parser
+    exit
+  end
+end
+
+parser.parse!(into: options)
+
+departure_city = City.new(name: options[:from])
+destination_cities = options[:to].map{|city_name| City.new(name: city_name)}
+
+search = AggregationSearch.new(
+    departure: departure_city,
+    destinations: destination_cities
+)
+comparator = Comparator.new(
+    flight_prices: search.flight_prices,
+    destinations: destination_cities,
+    departure: departure_city
+)
+comparator.result
+
+# ./flight-optimizer --from Istanbul --to London,Paris,Moscow
+
