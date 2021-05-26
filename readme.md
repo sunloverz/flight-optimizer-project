@@ -1,5 +1,5 @@
 ## Installation
-In order to run this script it needs to install `ruby-2.5.1`
+In order to run this script it needs to be installed `ruby-2.5.1`
 
 And we need to make the file executable:
  ```bash
