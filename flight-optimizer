@@ -9,6 +9,7 @@ require_relative 'city'
 require_relative 'aggregation_search'
 require_relative 'haversine_distance'
 require_relative 'comparator'
+require_relative 'fligh_price_iterator'
 
 options = {}
 parser = OptionParser.new do |parser|
@@ -29,8 +30,13 @@ search = AggregationSearch.new(
     departure: departure_city,
     destinations: destination_cities
 )
+
+flight_price_iterator = FlightPriceIterator.new(collection: search.flight_prices)
+destination_iterator = DestinationIterator.new
+
 comparator = Comparator.new(
-    flight_prices: search.flight_prices,
+    flight_price_iterator: flight_price_iterator,
+    destination_price_iterator: destination_iterator,
     destinations: destination_cities,
     departure: departure_city
 )
