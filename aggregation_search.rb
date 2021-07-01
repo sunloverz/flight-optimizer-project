@@ -5,17 +5,15 @@ class AggregationSearch
     @departure = departure
     @destinations = destinations
     @client = client
-    @flight_prices = get_flight_prices
+    get_flight_prices
   end
 
   def get_flight_prices
-    values = {}
     destinations.each do |destination|
       response = get_price_per_city(destination)
       _, price = response.fetch(:data).first
-      values[destination.code] = price
+      flight_prices << FlightPrice.new(city: destination, price: price)
     end
-    values
   end
 
   def get_price_per_city(destination)

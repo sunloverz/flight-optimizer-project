@@ -1,10 +1,10 @@
 class Comparator
   attr_reader :flight_prices, :departure, :destinations
-  Destination = Struct.new(:dollars_per_km, :price, :city_name)
-  MAX = 10000000.0
+  attr_reader :flight_price_iterator, :destination_price_iterator
 
-  def initialize(departure:, destinations:, flight_prices:)
-    @flight_prices = flight_prices
+  def initialize(departure:, destinations:, flight_price_iterator:, destination_price_iterator:)
+    @flight_price_iterator = flight_price_iterator
+    @destination_price_iterator = destination_price_iterator
     @departure = departure
     @destinations = destinations
   end
@@ -15,22 +15,19 @@ class Comparator
     puts "$#{min_dollars_per_km.round(3)}/km"
   end
 
+  private
+
   def find_min_price_with_city
-    min, city = MAX, ''
-    destination_list.each do |destination|
-      if destination.dollars_per_km < min
-        min = destination.dollars_per_km
-        city = destination.city_name
-      end
-    end
-    [min, city]
+    destination_price_iterator.find_min_price
   end
 
   def destination_list
     destinations.map do |destination|
       distance = haversine_distance(destination)
-      price = flight_prices[destination.code]
-      Destination.new(price/distance, price, destination.name)
+      price = flight_price_iterator.find_by_code(destination.code).price
+      destination_price_iterator << DestinationPrice.new(dollars_per_km: price/distance,
+                                                         price: price,
+                                                         city_name: destination.name)
     end
   end
 
